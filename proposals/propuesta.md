@@ -38,19 +38,22 @@ Registro de logs del sistema, eventos ocurridos en el transcurso del escaneo que
 Ejemplos:
 La cantidad de eventos depende de la opción ingresada por el usuario
 Tabla de eventos del sistema. 
-ID	LogName	LevelDisplayName	ProviderName	TimeCreated
-10013	System	Advertencia	Tcpip	10/09/2025 16:05
-10041	System	Advertencia	Netwtw10	20/10/2025 12:46
+| ID |	LogName |	LevelDisplayName |	ProviderName |	TimeCreated |
+|----|---------|------------------|--------------|-------------|
+| 10013 |	System |	Advertencia |	Tcpip	| 10/09/2025 16:05 |
+| 10041	| System	| Advertencia	| Netwtw10	| 20/10/2025 12:46 |
 
 Tabla de eventos del sistema. 
-ID	LogName	LevelDisplayName	ProviderName	TimeCreated
-10013	Security	Advertencia	Tcpip	10/09/2025 16:05
-10041	Security		Netwtw10	20/10/2025 12:46
+| ID |	LogName |	LevelDisplayName |	ProviderName |	TimeCreated |
+|----|---------|------------------|--------------|-------------|
+| 10013 |	Security |	Advertencia |	Tcpip	| 10/09/2025 16:05 |
+| 10041	| Security | Advertencia	| Netwtw10	| 20/10/2025 12:46 |
 
 Tabla de eventos del sistema. 
-ID	LogName	LevelDisplayName	ProviderName	TimeCreated
-10013	Application	Advertencia	Tcpip	10/09/2025 16:05
-10041	Application		Netwtw10	20/10/2025 12:46
+| ID |	LogName |	LevelDisplayName |	ProviderName |	TimeCreated |
+|----|---------|------------------|--------------|-------------|
+| 10013 |	Applications |	Advertencia |	Tcpip	| 10/09/2025 16:05 |
+| 10041	| Applications	| Advertencia	| Netwtw10	| 20/10/2025 12:46 |
 
 **Descripción del procedimiento**: 
 El usuario ejecutará este script usando las opciones programadas por el equipo para poder recibir un reporte sobre los eventos que tengan algún error o advertencia en su sistema, en el reporte se mostrará el ID del evento, su LogName al igual que el ProviderName que ayudaran al usuario a definir su curso de acción con este proceso
