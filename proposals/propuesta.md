@@ -137,9 +137,9 @@ Variables de entorno y configuración: No se requieren variables de entorno espe
 ## 👥 Asignación de roles del equipo
 | Integrante | Rol o responsabilidad |
 |------------|------------------------|
-| [Cristian] | [Desarrollar la primera tarea y realizar la interfaz] |
-| [Mikel] | [Desarrollar la segunda tarea y realizar la interfaz |
-| [Bruno] | [Desarrollar la tercera tarea y trabajar en la documentación del proyecto] |
+| Cristian| Desarrollar la primera tarea y realizar la interfaz |
+| Mikel | Desarrollar la segunda tarea y realizar la interfaz |
+| Bruno | Desarrollar la tercera tarea y trabajar en la documentación del proyecto |
 
 
 ---
