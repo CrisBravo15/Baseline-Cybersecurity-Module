@@ -26,6 +26,28 @@ import helpers
 # Configuracion de logs
 logs = helpers.logging.getLogger("Vuln")
 
+# Obtener dominio y más información de la tarea 1
+def obtener_dominio():
+    """
+    Lee el archivorecon.json de la Tarea 1
+    y devuelve el dominio si existe.
+    """
+    logs.info("Proceso de obtención del dominio anteriormente reconocido")
+    recon_dir = Path("outputs/output_recon")
+
+    json_path = recon_dir / "recon.json"
+
+    # Obtener datos del json
+    if json_path.exists():
+        with json_path.open("r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+                return data.get("dominio")
+            except Exception:
+                pass
+
+    return None
+
 # Scan DNS
 def query_dns(domain):
     resolver = dns.resolver.Resolver()
@@ -84,7 +106,17 @@ def subdomains_from_crtsh(domain):
         return {"error": str(e)}
 
 def main():
-    target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default)
+
+    target = obtener_dominio()
+
+    if target:
+        print(f"Dominio obtenido automáticamente desde recon.json: {target}")
+        logs.info("Dominio obtenido automáticamente desde recon.json")
+    else:
+        # Si no existe recon.json o está vacío, se pide al usuario
+        target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default).strip()
+
+    target = target.strip()
 
     target = target.strip()
     logs.info(f" Iniciando footprint pasivo para: {target}")
