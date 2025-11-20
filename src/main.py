@@ -1,6 +1,7 @@
-import scripts.helpers as helpers
 import pyfiglet
+import scripts.helpers as helpers
 import scripts.vuln_test as vuln
+import scripts.recon as recon
 
 # Limpiar a la consola
 helpers.clear_console()
@@ -21,7 +22,7 @@ def menu():
         print("-"*90)
         print(helpers.bold + helpers.verde + "Bienvenido al sistema Baseline Cybersecurity Module" + helpers.default)
         print("Seleccione una opción del menú:")
-        print("1 - Escaneo de puertos")
+        print("1 - Recolección de Datos Básicos del Dominio")
         print("2 - Footprinting pasivo")
         print("3 - Verificación de integridad de los datos")
         print("4 - Salir")
@@ -30,8 +31,7 @@ def menu():
 
         if op == 1:
             logs.info(" El usuario escogió la opcion 1")
-            print("Ejecución del escaneo de puertos...")
-            # Aquí va tu código futuro
+            recon.main()
 
         elif op == 2:
             logs.info(" El usuario escogió la opcion 2")
