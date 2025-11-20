@@ -1,0 +1,43 @@
+{
+  "version": "v1.1-ciberseguridad-analisis",
+  "tarea": "Analizar y Reportar Vulnerabilidades de Reconocimiento",
+  "template": "Reporte Analítico de Ciberseguridad",
+  "instrucciones": [
+    "Eres un analista de ciberseguridad experto. Tu objetivo es procesar los datos de reconocimiento proporcionados en la sección 'data' y generar un resumen conciso y profesional.",
+    "Identifica y clasifica todos los hallazgos de seguridad en tres categorías: **Vulnerabilidades Críticas**, **Advertencias** y **Observaciones Generales**.",
+    "Enfócate en la identificación de la superficie de ataque (subdominios de staging/dev), errores de DNS (AAAA, TXT timeouts) y la información Whois.",
+    "El reporte final debe estar en formato Markdown, siguiendo estrictamente la estructura solicitada en las instrucciones anteriores."
+  ],
+  "data": {
+    "dominio_objetivo": "github.com",
+    "reporte_recon_json": {
+      "ip_ping": "140.82.114.4",
+      "salida_ping": "Haciendo ping a github.com [140.82.114.4] con 32 bytes de datos:\nRespuesta desde 140.82.114.4: bytes=32 tiempo=76ms TTL=49...",
+      "nslookup": {
+        "ips_detectadas": [ "2806", "140.82.113.4" ],
+        "raw": "Servidor:  2806-1080-ffff-0002-0000-0000-0000-000e.ipv6.infinitum.net.mx\nAddress:  2806:1080:ffff:2::e\n\nNombre:  github.com\nAddress:  140.82.113.4"
+      }
+    },
+    "reporte_subdominios_jsonl": [
+      {"subdomain": "*.branch.github.com"},
+      {"subdomain": "*.codespaces-dev.github.com"},
+      // ... (Agregar todos los subdominios clave aquí)
+      {"subdomain": "api.mcp.github.com"},
+      {"subdomain": "www.ws.support.github.com"}
+    ],
+    "reporte_vulnerabilidades_jsonl": {
+      "dns": {
+        "A": ["140.82.112.3"],
+        "AAAA": {"error": "The DNS response does not contain an answer..."},
+        "MX": ["5 alt1.aspmx.l.google.com.", "..."],
+        "TXT": {"error": "The resolution lifetime expired after 5.415 seconds..."}
+      },
+      "whois": {
+        "registrar": "MarkMonitor, Inc.",
+        "creation_date": "2007-10-09 18:20:50+00:00",
+        "emails": ["abusecomplaints@markmonitor.com", "whoisrequest@markmonitor.com"]
+      },
+      "subdomains": {"count": 124, "subdomains": ["*.branch.github.com", "..."]}
+    }
+  }
+}
