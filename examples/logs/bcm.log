@@ -1,0 +1,27 @@
+2025-11-19 21:20:58 - INFO -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+2025-11-19 21:20:58 - INFO -  El usuario ingresó al programa
+2025-11-19 21:21:42 - INFO -  El usuario escogió la opcion 1
+2025-11-19 21:21:48 - INFO - El usuario va a realizar un reconocimiento de github.com
+2025-11-19 21:21:48 - INFO - Se logró obtener la IP
+2025-11-19 21:21:48 - INFO - Se terminó de ejecutar nslookup
+2025-11-19 21:21:48 - INFO - Reporte finalizado y guardado en output/output_recon/recon.json
+2025-11-19 21:21:50 - INFO -  El usuario escogió la opcion 2
+2025-11-19 21:21:50 - INFO - Proceso de obtención del dominio anteriormente reconocido
+2025-11-19 21:21:50 - INFO - Dominio obtenido automáticamente desde recon.json
+2025-11-19 21:21:50 - INFO -  Iniciando footprint pasivo para: github.com
+2025-11-19 21:21:50 - DEBUG - Se comenzó a consultar github.com con el scan DNS
+2025-11-19 21:21:50 - DEBUG - Se consultó correctamente A
+2025-11-19 21:21:50 - ERROR - Hubo un error consultando AAAA
+2025-11-19 21:21:50 - DEBUG - Se consultó correctamente MX
+2025-11-19 21:21:50 - DEBUG - Se consultó correctamente NS
+2025-11-19 21:21:55 - ERROR - Hubo un error consultando TXT
+2025-11-19 21:21:55 - DEBUG - Se comenzó a consultar github.com con WHOIS
+2025-11-19 21:21:56 - DEBUG - Se consultó correctamente WHOIS
+2025-11-19 21:21:56 - DEBUG - Se comenzó a consultar los subdominios de github.com con CRT.SH
+2025-11-19 21:21:56 - DEBUG - Starting new HTTPS connection (1): crt.sh:443
+2025-11-19 21:22:12 - DEBUG - https://crt.sh:443 "GET /?q=%25.github.com&output=json HTTP/1.1" 502 150
+2025-11-19 21:22:12 - ERROR - No se pudo conectar con el subdominio
+2025-11-19 21:22:12 - ERROR - Subdominios: no listados o error. Resultado guardado en outputs\output_vuln\subdominios_github_com_2025-11-19_21-20-58.jsonl
+2025-11-19 21:22:12 - DEBUG - Reporte finalizado y guardado en outputs\output_vuln\Vuln_reporte_github_com_2025-11-19_21-20-58.jsonl
+2025-11-19 21:31:09 - INFO -  El usuario salió del sistema 
+2025-11-19 21:31:09 - INFO -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
