@@ -20,16 +20,16 @@ module_path = Path(__file__).parent
 if str(module_path) not in sys.path:
     sys.path.append(str(module_path))
 
-# Importamos helpers despues de acomodar la ruta inicial
+# Inicializar el Logger
 import helpers
-
-# Configuracion de logs
-logs = helpers.logging.getLogger("Vuln")
+import uuid
+EXECUTION_ID = str(uuid.uuid4())[:8]
+logs = helpers.setup_logging(execution_id=EXECUTION_ID)
 
 # Obtener dominio y más información de la tarea 1
 def obtener_dominio():
     """
-    Lee el archivorecon.json de la Tarea 1
+    Lee el archivo recon.json de la Tarea 1
     y devuelve el dominio si existe.
     """
     logs.info("Proceso de obtención del dominio anteriormente reconocido")
@@ -115,8 +115,6 @@ def main():
     else:
         # Si no existe recon.json o está vacío, se pide al usuario
         target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default).strip()
-
-    target = target.strip()
 
     target = target.strip()
     logs.info(f" Iniciando footprint pasivo para: {target}")
