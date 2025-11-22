@@ -16,5 +16,8 @@ Esta tarea tiene como misión conocer datos como la IP con el comando de ping (-
 ## Tarea 2: Footprinting pasivo
 Esta tarea realiza actividades de footprinting pasivo como consulta del DNS para obtener (A,AAAA,MX,NS,TXT), consulta WHOIS para obtener información como la fecha de creación, fecha de expiración, correos electrónicos de contacto, etc; tambien se realiza la búsqueda de subdominios que están asociados a un dominio
 
+## Tarea 3: Verificación de reputación
+Esta tarea realiza una consulta a la API de AbuseIPDB para conocer la reputación de las ips asociadas a un dominio, como puede ser el total de reportes, si es considerada maliciosa, etc.
+
 # Estado del proyecto
-Estamos decidiendo un poco si cambiar la tercer tarea o mantener la de la integridad para chequear hashes y mantener la integridad de los logs y los reportes, pero hasta ahora las primeras dos tareas y su conexión mediante el script main.py funciona todo a la perfección
+Se integraron las 3 tareas al flujo principal, se están puliendo los ultimos detalles para la entrega final
