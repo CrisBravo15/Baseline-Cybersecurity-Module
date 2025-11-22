@@ -1,18 +1,20 @@
-from pathlib import Path
-import dns.resolver
-import whois
 import json
-import requests
+import re
 import sys
+from pathlib import Path
+import recon
+import requests
+import vuln_test as vuln
+
 
 # Configurar las salidas
 ruta = Path.cwd()
 
 if ruta.name == "scripts":
-    OUTDIR = Path("../outputs/output_vuln")   
+    OUTDIR = Path("../outputs/output_add")   
     OUTDIR.mkdir(parents=True, exist_ok=True)
 else:
-    OUTDIR = Path("outputs/output_vuln")
+    OUTDIR = Path("outputs/output_add")
     OUTDIR.mkdir(parents=True, exist_ok=True)
 
 # Configuramos la ruta
@@ -26,88 +28,49 @@ import uuid
 EXECUTION_ID = str(uuid.uuid4())[:8]
 logs = helpers.setup_logging(execution_id=EXECUTION_ID)
 
-# Obtener dominio y más información de la tarea 1
-def obtener_dominio():
-    """
-    Lee el archivo recon.json de la Tarea 1
-    y devuelve el dominio si existe.
-    """
-    logs.info("Proceso de obtención del dominio anteriormente reconocido")
-    recon_dir = Path("outputs/output_recon")
 
-    json_path = recon_dir / "recon.json"
+# Revisar reputación con AbuseIPDB
+def consultar_reputacion_abuseipdb(ip):
+    """Consulta la reputación de una IP usando la API de AbuseIPDB."""
+    url = "https://api.abuseipdb.com/api/v2/check"
 
-    # Obtener datos del json
-    if json_path.exists():
-        with json_path.open("r", encoding="utf-8") as f:
-            try:
-                data = json.load(f)
-                return data.get("dominio")
-            except Exception:
-                pass
+    params = {
+        "ipAddress": ip,
+        "maxAgeInDays": 90
+    }
 
-    return None
+    headers = {
+        "Accept": "application/json",
+        "Key": "9619a6591152ab555ec813a197d0c64134d4b2283979b3b073c6442ad1afa5bd48c043770aa14485"
+    }
 
-# Scan DNS
-def query_dns(domain):
-    resolver = dns.resolver.Resolver()
-    out = {}
-    for q in ("A", "AAAA", "MX", "NS", "TXT"):
-        try:
-            answers = resolver.resolve(domain, q, lifetime=5)
-            out[q] = [r.to_text().strip() for r in answers]
-            logs.debug(f"Se consultó correctamente {q}")
-        except Exception as e:
-            out[q] = {"error": str(e)}
-            logs.error(f"Hubo un error consultando {q}")
-    return out
-
-# Scan WHOIS
-def query_whois(domain):
     try:
-        w = whois.whois(domain)
-        def safe(v):
-            try:
-                json.dumps(v)
-                return v
-            except Exception:
-                try:
-                    return str(v)
-                except Exception:
-                    return None
-        logs.debug(f"Se consultó correctamente WHOIS")
-        return {k: safe(v) for k, v in dict(w).items()}
+        response = requests.get(url, headers=headers, params=params)
+        data = response.json()
+        logs.debug(f"Respuesta de AbuseIPDB para {ip}: {data}")
+        
+        # Devuelve resultados estructurados
+        if "data" in data:
+            logs.info(f"Reputación obtenida para {ip}.")
+            return {
+                "ip": ip,
+                "abuse_score": data["data"]["abuseConfidenceScore"],
+                "total_reports": data["data"]["totalReports"],
+                "es_maliciosa": data["data"]["abuseConfidenceScore"] > 0,
+                "informacion_completa": data["data"]
+            }
+            
+        else:
+            logs.error(f"Respuesta no válida o error de AbuseIPDB para {ip}.")
+            return {"error": "Respuesta no válida de AbuseIPDB", "raw": data}
+
     except Exception as e:
-        logs.error("Hubo un error consultando WHOIS")
         return {"error": str(e)}
 
-# Obtener subdominios con crt.sh
-def subdomains_from_crtsh(domain):
-
-    url = f"https://crt.sh/?q=%25.{domain}&output=json"
-    try:
-        r = requests.get(url, timeout=15)
-        if r.status_code != 200:
-            logs.error("No se pudo conectar con el subdominio")
-            return {"error": f"crt.sh regresó {r.status_code}"}
-        data = r.json()
-        subs = set()
-        for entry in data:
-            name = entry.get("name_value", "")
-            for n in name.split("\n"):
-                n = n.strip()
-                if n and n.endswith(domain):
-                    subs.add(n)
-        subs_list = sorted(subs)
-        logs.debug(f"Se terminó de consultar los subdominios de {domain} con CRT.SH")
-        return {"count": len(subs_list), "subdomains": subs_list}
-    except Exception as e:
-        logs.error("Hubo un error al obtener informacion del subdominio")
-        return {"error": str(e)}
-
+# Función principal
 def main():
-
-    target = obtener_dominio()
+    """Realiza análisis completo de Threat Intelligence básico."""
+    target = vuln.obtener_dominio()
 
     if target:
         print(f"Dominio obtenido automáticamente desde recon.json: {target}")
@@ -115,51 +78,47 @@ def main():
     else:
         # Si no existe recon.json o está vacío, se pide al usuario
         target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default).strip()
+        logs.info(f"Dominio ingresado manualmente: {target}")
 
     target = target.strip()
-    logs.info(f" Iniciando footprint pasivo para: {target}")
-
-    # DNS
-    logs.debug(f"Se comenzó a consultar {target} con el scan DNS")
-    dns_res = query_dns(target)
-
-    # WHOIS
-    logs.debug(f"Se comenzó a consultar {target} con WHOIS")
-    whois_res = query_whois(target)
-    whois_clean = {k: whois_res.get(k) for k in ("registrar", "creation_date", "expiration_date", "name_servers", "emails")}
-
-    # Subdominios (crt.sh)
-    logs.debug(f"Se comenzó a consultar los subdominios de {target} con CRT.SH")
-    crtsh_res = subdomains_from_crtsh(target)
-
-    # Guardar subdominios por separado si vinieron bien
-    subs_json_path = OUTDIR / f"subdominios_{target.replace('.','_')}_{helpers.horaact}.jsonl"
+    logs.info(f"Iniciando consulta DNS para el dominio: {target}")
+    query = vuln.query_dns(target)
     
-    if isinstance(crtsh_res, dict) and "subdomains" in crtsh_res:
-        with subs_json_path.open("w", encoding="utf-8") as fh:
-            for sub in crtsh_res["subdomains"]:
-                obj = {"target": target, "time": helpers.horaact, "subdomain": sub}
-                fh.write(json.dumps(obj, ensure_ascii=False) + "\n")
-    else:
-        with subs_json_path.open("w", encoding="utf-8") as fh:
-            fh.write(json.dumps({"target": target, "time": helpers.horaact, "result": crtsh_res}, ensure_ascii=False) + "\n")
-        logs.error(f"Subdominios: no listados o error. Resultado guardado en {subs_json_path}")
+    ipv4s = []
 
-    # Reporte json total
-    report = {
-        "metadata": {"target": target, "run_time": helpers.horaact},
-        "dns": dns_res,
-        "whois": whois_clean,
-        "subdomains": crtsh_res
-    }
+    for value in query.values():
+        if isinstance(value, list):
+            texto = " ".join(value)
+            ipv4s.extend(re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', texto))
 
-    out_path = OUTDIR / f"Vuln_reporte_{target.replace('.', '_')}_{helpers.horaact}.jsonl"
+        elif isinstance(value, str):
+            ipv4s.extend(re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', value))
+    
+    logs.info(f"IPs extraídas del registro DNS: {ipv4s}")
+    print(f"\n Analizando IPs: {ipv4s}")
+    analisis_final = {"IPs": ipv4s}
+    analisis_final["ioCs"] = []
+ 
+    # Procesar cada IP encontrada
+    for ip in ipv4s:
+        print(f"   → Procesando IP encontrada: {ip}")
+        logs.info(f"Analizando la IP: {ip}")
+        reputacion = consultar_reputacion_abuseipdb(ip)
+
+        analisis_final["ioCs"].append({
+            "ip": ip,
+            "reputacion": reputacion
+        })
+    print("\n Análisis completado.")
+
+    out_path = OUTDIR / f"Add_reporte_{helpers.horaact}.jsonl"
     # Guardar en JSONL (una línea por objeto)
     with out_path.open("w", encoding="utf-8") as fh:
-        fh.write(json.dumps(report, ensure_ascii=False) + "\n")
+        fh.write(json.dumps(analisis_final, ensure_ascii=False) + "\n")
 
     logs.debug(f"Reporte finalizado y guardado en {out_path}")
     print(f"Reporte finalizado y guardado en {out_path}")
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     main()
+
