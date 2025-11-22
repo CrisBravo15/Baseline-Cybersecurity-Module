@@ -14,8 +14,9 @@ else:
     os.makedirs("logs", exist_ok=True)
     ruta_log = "logs/bcm.log"    
 
-# Adaptador para el RUN_ID 
+# Adaptador para inyectar contexto (el RUN_ID) 
 class ContextAdapter(logging.LoggerAdapter):
+    """Adaptador que inyecta datos de contexto (como el run_id) en el log."""
     def process(self, msg, kwargs):
         # Asegura que el diccionario extra esté presente
         if 'extra' not in kwargs:
@@ -25,26 +26,21 @@ class ContextAdapter(logging.LoggerAdapter):
         return msg, kwargs
 
 # Función de Configuración e Inicialización
-def setup_logging(execution_id: str):
-    logger_base = logging.getLogger('app')
-    logger_base.setLevel(logging.DEBUG) # Establecer el nivel global del logger
-
-    log_format = logging.Formatter(
-        fmt="%(asctime)s - %(levelname)s - [RUN_ID: %(run_id)s] - [Module: %(module)s] - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+def setup_logging(execution_id: str):    
+    # Configuración global básica
+    logging.basicConfig(
+        filename="../logs/bcm.log",
+        level=logging.DEBUG,
+        # Incluye %(module)s y el campo personalizado %(run_id)s
+        format="%(asctime)s - %(levelname)s - [RUN_ID: %(run_id)s] - [Module: %(module)s] - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        encoding="utf-8"
     )
 
-    file_handler = logging.FileHandler(ruta_log, encoding="utf-8")
-    file_handler.setFormatter(log_format)
-    file_handler.setLevel(logging.DEBUG) # Opcional: establecer el nivel del manejador
+    # Obtener el logger estándar (usando el nombre 'app' como base)
+    logger_base = logging.getLogger('app')
 
-    if logger_base.hasHandlers():
-        logger_base.handlers.clear()
-
-    logger_base.propagate = False
-    
-    logger_base.addHandler(file_handler)
-
+    # Crear y devolver la instancia del adaptador con el contexto
     logs = ContextAdapter(logger_base, {'run_id': execution_id})
     return logs
 
@@ -61,4 +57,3 @@ horaact = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 # Funcion para limpiar la consola
 def clear_console():
     os.system("cls" if os.name == "nt" else "clear")
-
