@@ -8,8 +8,8 @@ import sys
 ruta = Path.cwd()
 
 if ruta.name == "scripts":
-    os.makedirs("../logs", exist_ok=True)
-    ruta_log = "../logs/bcm.log"
+    os.makedirs("../../logs", exist_ok=True)
+    ruta_log = "../../logs/bcm.log"
 else:
     os.makedirs("logs", exist_ok=True)
     ruta_log = "logs/bcm.log"    
@@ -29,7 +29,7 @@ class ContextAdapter(logging.LoggerAdapter):
 def setup_logging(execution_id: str):    
     # Configuración global básica
     logging.basicConfig(
-        filename="../logs/bcm.log",
+        filename=ruta_log,
         level=logging.DEBUG,
         # Incluye %(module)s y el campo personalizado %(run_id)s
         format="%(asctime)s - %(levelname)s - [RUN_ID: %(run_id)s] - [Module: %(module)s] - %(message)s",
