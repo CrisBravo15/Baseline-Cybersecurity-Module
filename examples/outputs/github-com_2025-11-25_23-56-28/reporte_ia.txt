@@ -1,0 +1,28 @@
+## An�lisis de Ciberseguridad
+
+### Resumen Ejecutivo
+Se realiz� un an�lisis de ciberseguridad en el dominio github.com y la IP 140.82.113.4. La IP mapeada al dominio responde bien a ping y tiene una reputaci�n limpia seg�n AbuseIPDB. El dominio tiene m�ltiples subdominios y registros asociados, as� como servidores de nombres y servidores de correo con diferentes proveedores. El dominio ha estado activo desde 2007 y tiene una cantidad significativa de subdominios.
+
+### Descripci�n T�cnica Detallada
+Se identific� que la IP 140.82.113.4 pertenece a la entidad GitHub, Inc., con sede en EE. UU. La IP no se encuentra en listas de abuso y no se considera maliciosa. El dominio github.com tiene asociados m�ltiples subdominios (124 en total), con una diversidad de funcionalidades como API, comunicaci�n, desarrollo, entre otros.
+
+### Vulnerabilidades Identificadas
+No se identificaron vulnerabilidades cr�ticas, altas, ni medias en la IP 140.82.113.4 ni en el dominio github.com. 
+
+### An�lisis de IPs Sospechosas
+La IP 140.82.113.4 tiene una reputaci�n limpia, sin reportes de abuso, y est� asociada a GitHub, una plataforma ampliamente conocida y leg�tima. No se detectaron actividades maliciosas ni riesgos significativos.
+
+### Impacto Potencial para el Negocio/Sistema
+Dado que no se identificaron vulnerabilidades cr�ticas ni actividades sospechosas en la IP o dominio analizado, el impacto potencial para el negocio o sistema es bajo. GitHub sigue manteniendo una reputaci�n positiva y no se han encontrado indicios de compromiso.
+
+### Riesgos Asociados
+No se identificaron riesgos significativos en la informaci�n analizada. La reputaci�n limpia de la IP y el historial del dominio github.com reflejan un entorno de baja probabilidad de riesgos de seguridad.
+
+### Evidencias y Recomendaciones
+Las evidencias provistas muestran un entorno seguro y sin indicios de compromiso. Se recomienda seguir las mejores pr�cticas de seguridad inform�tica, como mantener actualizados los sistemas y aplicaciones, realizar copias de seguridad regularmente y monitorear activamente cualquier cambio en el entorno de red.
+
+### Indicadores de Compromiso (IOCs) Relevantes
+No se encontraron IOCs relevantes en los datos proporcionados.
+
+### Conclusi�n
+Seg�n el an�lisis realizado, la IP 140.82.113.4 y el dominio github.com presentan un buen estado de seguridad. No se observaron vulnerabilidades cr�ticas, riesgos significativos ni indicadores de compromiso. Se recomienda seguir las medidas de seguridad est�ndar y mantener la vigilancia sobre posibles cambios en el entorno de red.
