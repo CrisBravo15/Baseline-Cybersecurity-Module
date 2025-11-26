@@ -1,0 +1,13 @@
+{
+    "dominio": "github.com",
+    "ip_ping": "140.82.112.4",
+    "salida_ping": "Haciendo ping a github.com [140.82.112.4] con 32 bytes de datos:\nRespuesta desde 140.82.112.4: bytes=32 tiempo=74ms TTL=49\n\nEstad¡sticas de ping para 140.82.112.4:\n    Paquetes: enviados = 1, recibidos = 1, perdidos = 0\n    (0% perdidos),\nTiempos aproximados de ida y vuelta en milisegundos:\n    M¡nimo = 74ms, M ximo = 74ms, Media = 74ms",
+    "nslookup": {
+        "ips_detectadas": [
+            "2806",
+            "140.82.112.4"
+        ],
+        "servidores_dns": [],
+        "raw": "Servidor:  2806-1080-ffff-0002-0000-0000-0000-000e.ipv6.infinitum.net.mx\nAddress:  2806:1080:ffff:2::e\n\nNombre:  github.com\nAddress:  140.82.112.4"
+    }
+}

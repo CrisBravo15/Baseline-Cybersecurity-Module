@@ -5,27 +5,6 @@ import json
 import requests
 import sys
 
-# Configurar las salidas
-ruta = Path.cwd()
-
-if ruta.name == "scripts":
-    OUTDIR = Path("../outputs/output_vuln")   
-    OUTDIR.mkdir(parents=True, exist_ok=True)
-else:
-    OUTDIR = Path("outputs/output_vuln")
-    OUTDIR.mkdir(parents=True, exist_ok=True)
-
-# Configuramos la ruta
-module_path = Path(__file__).parent
-if str(module_path) not in sys.path:
-    sys.path.append(str(module_path))
-
-# Inicializar el Logger
-import helpers
-import uuid
-EXECUTION_ID = str(uuid.uuid4())[:8]
-logs = helpers.setup_logging(execution_id=EXECUTION_ID)
-
 # Obtener dominio y más información de la tarea 1
 def obtener_dominio():
     """
@@ -33,8 +12,13 @@ def obtener_dominio():
     y devuelve el dominio si existe.
     """
     logs.info("Proceso de obtención del dominio anteriormente reconocido")
-    recon_dir = Path("outputs/output_recon")
+    
+    ultima = max((p for p in Path("outputs/").iterdir() if p.is_dir()),
+             key=lambda p: p.stat().st_mtime,
+             default=None)
 
+    recon_dir = Path(f"{ultima}/output_recon")
+    carpeta = Path(recon_dir).parent
     json_path = recon_dir / "recon.json"
 
     # Obtener datos del json
@@ -42,11 +26,19 @@ def obtener_dominio():
         with json_path.open("r", encoding="utf-8") as f:
             try:
                 data = json.load(f)
-                return data.get("dominio")
+                print(f"Dominio obtenido automáticamente desde recon.json: {data.get('dominio')}")
+                logs.info("Dominio obtenido automáticamente desde recon.json")
+                tupla = (data.get("dominio"),carpeta)
+                return data.get("dominio"),carpeta
             except Exception:
                 pass
+    return None, None
 
-    return None
+# Inicializar el Logger
+import scripts.helpers as helpers
+import uuid
+EXECUTION_ID = str(uuid.uuid4())[:8]
+logs = helpers.setup_logging(execution_id=EXECUTION_ID)
 
 # Scan DNS
 def query_dns(domain):
@@ -106,16 +98,37 @@ def subdomains_from_crtsh(domain):
         return {"error": str(e)}
 
 def main():
-
-    target = obtener_dominio()
-
-    if target:
-        print(f"Dominio obtenido automáticamente desde recon.json: {target}")
-        logs.info("Dominio obtenido automáticamente desde recon.json")
+    while True:
+        opcion = input("Usar dominio anterior? (Si/No): ").lower()
+        
+        if opcion == "si" or opcion == "sí":
+            logs.info("Proceso de obtención del dominio anteriormente reconocido")
+            target, carpeta = obtener_dominio()
+            
+            if not target:
+                print("No se pudo obtener el dominio")
+                target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default).strip()
+                carpeta = target.replace(".","-") + f"_{helpers.horaact}"
+            break
+        elif opcion == "no":
+            target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default).strip()
+            carpeta = target.replace(".","-") + f"_{helpers.horaact}"
+        else:
+            print("Ingresa Sí o No")
+    
+    ruta = Path.cwd()
+    if ruta.name == "scripts":
+        OUTDIR = Path(f"../outputs/{carpeta}/output_vuln")   
+        OUTDIR.mkdir(parents=True, exist_ok=True)
     else:
-        # Si no existe recon.json o está vacío, se pide al usuario
-        target = input("Ingrese el nombre del dominio" + helpers.bold + " (ejemplo: ejemplo.com): " + helpers.default).strip()
+        OUTDIR = Path(f"{carpeta}/output_vuln")
+        OUTDIR.mkdir(parents=True, exist_ok=True)
 
+    # Configuramos la ruta
+    module_path = Path(__file__).parent
+    if str(module_path) not in sys.path:
+        sys.path.append(str(module_path))
+    
     target = target.strip()
     logs.info(f" Iniciando footprint pasivo para: {target}")
 
@@ -133,7 +146,7 @@ def main():
     crtsh_res = subdomains_from_crtsh(target)
 
     # Guardar subdominios por separado si vinieron bien
-    subs_json_path = OUTDIR / f"subdominios_{target.replace('.','_')}_{helpers.horaact}.jsonl"
+    subs_json_path = OUTDIR / f"subdominios.json"
     
     if isinstance(crtsh_res, dict) and "subdomains" in crtsh_res:
         with subs_json_path.open("w", encoding="utf-8") as fh:
@@ -153,12 +166,13 @@ def main():
         "subdomains": crtsh_res
     }
 
-    out_path = OUTDIR / f"Vuln_reporte_{target.replace('.', '_')}_{helpers.horaact}.jsonl"
-    # Guardar en JSONL (una línea por objeto)
-    with out_path.open("w", encoding="utf-8") as fh:
-        fh.write(json.dumps(report, ensure_ascii=False) + "\n")
+    out_path = OUTDIR / f"vuln_reporte.json"
+    with open(out_path, "w", encoding="utf-8") as fh:
+        json.dump(report, fh, ensure_ascii=False, indent=4)
+
 
     logs.debug(f"Reporte finalizado y guardado en {out_path}")
+    print("\nAnálisis completado de vulnerabilidades.")
     print(f"Reporte finalizado y guardado en {out_path}")
 
 if __name__ == "__main__": 
